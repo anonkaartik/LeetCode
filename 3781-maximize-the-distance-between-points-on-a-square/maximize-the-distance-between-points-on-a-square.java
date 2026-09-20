@@ -11,26 +11,26 @@ class Solution {
             int x = points[i][0];
             int y = points[i][1];
 
-            if (y == 0) {
-                pos[i] = x;
-            } else if (x == side) {
-                pos[i] = (long) side + y;
+            if (x == 0) {
+                pos[i] = y;
             } else if (y == side) {
-                pos[i] = 3L * side - x;
+                pos[i] = (long) side + x;
+            } else if (x == side) {
+                pos[i] = 3L * side - y;
             } else {
-                pos[i] = 4L * side - y;
+                pos[i] = 4L * side - x;
             }
         }
 
         Arrays.sort(pos);
 
         long low = 0;
-        long high = 2L * side;
+        long high = side;
 
         while (low < high) {
             long mid = low + (high - low + 1) / 2;
 
-            if (canPlace(pos, perimeter, k, mid)) {
+            if (canSelect(pos, perimeter, k, mid)) {
                 low = mid;
             } else {
                 high = mid - 1;
@@ -40,7 +40,7 @@ class Solution {
         return (int) low;
     }
 
-    private boolean canPlace(long[] pos, long perimeter, int k, long d) {
+    private boolean canSelect(long[] pos, long perimeter, int k, long d) {
         int n = pos.length;
 
         long[] arr = new long[2 * n];
@@ -51,6 +51,7 @@ class Solution {
         }
 
         int[] next = new int[2 * n];
+
         int j = 0;
 
         for (int i = 0; i < 2 * n; i++) {
