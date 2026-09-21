@@ -1,88 +1,95 @@
 import java.util.*;
 
 class Solution {
-    public int maxDistance(int side, int[][] points, int k) {
-        int n = points.length;
-        long perimeter = 4L * side;
+    private long[] nums;
+    private int side;
+    private int k;
 
-        long[] pos = new long[n];
+    public int maxDistance(int side, int[][] points, int k) {
+        this.side = side;
+        this.k = k;
+
+        int n = points.length;
+        nums = new long[n];
 
         for (int i = 0; i < n; i++) {
             int x = points[i][0];
             int y = points[i][1];
 
             if (x == 0) {
-                pos[i] = y;
+                nums[i] = y;
             } else if (y == side) {
-                pos[i] = (long) side + x;
+                nums[i] = (long) side + x;
             } else if (x == side) {
-                pos[i] = 3L * side - y;
+                nums[i] = (long) side * 3 - y;
             } else {
-                pos[i] = 4L * side - x;
+                nums[i] = (long) side * 4 - x;
             }
         }
 
-        Arrays.sort(pos);
+        Arrays.sort(nums);
 
-        long low = 0;
-        long high = side;
+        int left = 1;
+        int right = side;
 
-        while (low < high) {
-            long mid = low + (high - low + 1) / 2;
+        while (left < right) {
+            int mid = left + (right - left + 1) / 2;
 
-            if (canSelect(pos, perimeter, k, mid)) {
-                low = mid;
+            if (check(mid)) {
+                left = mid;
             } else {
-                high = mid - 1;
+                right = mid - 1;
             }
         }
 
-        return (int) low;
+        return left;
     }
 
-    private boolean canSelect(long[] pos, long perimeter, int k, long d) {
-        int n = pos.length;
+    private boolean check(int distance) {
+        long perimeter = (long) side * 4;
 
-        long[] arr = new long[2 * n];
+        for (int i = 0; i < nums.length; i++) {
+            long start = nums[i];
+            long end = start + perimeter - distance;
+            long current = start;
 
-        for (int i = 0; i < n; i++) {
-            arr[i] = pos[i];
-            arr[i + n] = pos[i] + perimeter;
-        }
+            boolean possible = true;
 
-        int[] next = new int[2 * n];
+            for (int j = 0; j < k - 1; j++) {
+                long target = current + distance;
 
-        int j = 0;
+                int index = lowerBound(target);
 
-        for (int i = 0; i < 2 * n; i++) {
-            if (j < i + 1) {
-                j = i + 1;
-            }
-
-            while (j < 2 * n && arr[j] - arr[i] < d) {
-                j++;
-            }
-
-            next[i] = j;
-        }
-
-        for (int start = 0; start < n; start++) {
-            int current = start;
-
-            for (int count = 1; count < k; count++) {
-                current = next[current];
-
-                if (current >= start + n) {
+                if (index == nums.length || nums[index] > end) {
+                    possible = false;
                     break;
                 }
+
+                current = nums[index];
             }
 
-            if (current < start + n &&
-                arr[current] - arr[start] <= perimeter - d) {
+            if (possible) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private int lowerBound(long target) {
+        int left = 0;
+        int right = nums.length;
+
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+
+        return left;
     }
 }
