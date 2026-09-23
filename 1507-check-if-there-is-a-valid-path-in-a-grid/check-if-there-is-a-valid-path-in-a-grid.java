@@ -52,32 +52,21 @@ class Solution {
                     continue;
                 }
 
-                if (isConnected(grid[nr][nc], direction)) {
+                int opposite = (direction + 2) % 4;
+
+                boolean connected = false;
+
+                for (int nextDirection : connections[grid[nr][nc]]) {
+                    if (nextDirection == opposite) {
+                        connected = true;
+                        break;
+                    }
+                }
+
+                if (connected) {
                     visited[nr][nc] = true;
                     queue.offer(new int[]{nr, nc});
                 }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isConnected(int street, int direction) {
-        int opposite = (direction + 2) % 4;
-
-        int[][] connections = {
-            {},
-            {3, 1},
-            {0, 2},
-            {3, 2},
-            {1, 2},
-            {3, 0},
-            {1, 0}
-        };
-
-        for (int d : connections[street]) {
-            if (d == opposite) {
-                return true;
             }
         }
 
